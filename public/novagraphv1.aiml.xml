@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml>
+   <category>
+     <pattern>COSA * AUTOMA</pattern>
+     <template>Puoi chiedermi di descrivertelo. Ad esempio, puoi chiedermi quali sono le transizioni o se esiste un percorso fra due nodi</template>
+   </category>
+  
+    <category>
+     <pattern>* DESCRIVI BREVEMENTE * AUTOMA</pattern>
+     <template>E un automa con un alfabeto binario che determina se il numero di 0 e il numero di 1 siano pari</template>
+    </category>
+  
+    <category>
+     <pattern>DIMMI DI PIU</pattern>
+     <that>E un automa con un alfabeto binario che determina se il numero di 0 e il numero di 1 siano pari</that>
+     <template>Ci sono un totale di due stati: s1 e s2. s1 è sia stato iniziale che stato finale. Da s1 partono due archi. Il primo arco punta se stesso ed è contrassegnato da 1, l’altro punta s2 ed è contrassegnato da 0. Anche da s2 partono due archi. Il primo arco punta se stesso ed è contrassegnato da 1, l’altro è contrassegnato da 0</template>
+    </category>
+  
+    <category>
+     <pattern>DESCRIVI * AUTOMA</pattern>
+     <template>E un automa con un alfabeto binario che determina se il numero di 0 e il numero di 1 siano pari. Si usa lo stato per ricordare se il numero degli 0 e il numero degli I visti fino a quel momento e pari o dispari. Ci sono un totale di 4 stati: q0, q1, q2 e q3. q0 è sia stato inziale che finale. Da ogni stato partono 2 archi: da q0 il primo arco punta a q1 ed e contrassegnato da 1, mentre il secondo punta a q2 ed e contrassegnato da 0. Da q1 il primo punta a q0 contrassegnato da 1, il secondo a q3 contrassegnato da 0. Da q2 il primo punta a q0 contrassegnato da 0, il secondo a q3 contrassegnato da 1. Infine, da q3 il primo punta a q1 contrassegnato da 0, il secondo a q2 contrassegnato da 1</template>
+    </category>
+    
+   <category>
+     <pattern>ESISTE UNO STATO *</pattern>
+     <template>
+      <think><set name = "state"><star /></set></think>
+      <condition name = "state" value = "q5"> No, non c’è uno stato così chiamato </condition>
+      <condition name = "state" value = "q3"> Si, esiste! </condition>
+     </template>
+   </category>    
+
+   <category>
+     <pattern>* Q1 A Q3</pattern>
+     <template>Da Q1 c’è un arco diretto contrassegnato da 0 che conduce a Q3</template>
+   </category>       
+   
+   <category>
+     <pattern>* AIUTO</pattern>
+     <template>
+      <random>
+       <li>Grazie a te!</li>
+       <li>Grazie del tuo tempo!</li>
+      </random>
+     </template>
+    </category>       
+    
+    <category>
+     <pattern>COME E RAPPRESENTATO L AUTOMA</pattern>
+     <template>Il grafico viene rappresentano con due linee tratteggiate che si incontrano perpendicolarmente formando quattro quadrati distinti. In ogni quadrante è possibile disporre uno stato distinto. Partendo da quello in alto a destra e andando in senso antiorario troviamo: q1, q0, q2 e infine q3. La caratteristica è che ogni arco che attraversa la linea tratteggiata orizzontale è contrassegnato da 0, viceversa quelle verticali sono contrassegnate da 1</template>
+   </category>   
+   
+    <category>
+     <pattern>* PATTERN * ARCHI</pattern>
+     <template>Si, da ogni stato partono 2 archi, uno contrassegnato da 0 e l’altro da 1</template>
+   </category>  
+   
+    <category>
+     <pattern>* LINGUAGGIO ACCETTATO</pattern>
+     <template>È il linguaggio formato dalle parole che sono formate da un numero di 0 e 1 pari</template>
+   </category>  
+   
+    <category>
+     <pattern>* INIZIALE * FINALI</pattern>
+     <template>q0 è sia stato iniziale che finale</template>
+   </category>
+   
+    <category>
+     <pattern>* VEDERE * AUTOMA</pattern>
+     <template>
+     <button>
+         <text>Ecco qua!</text>
+         <url>https://imgur.com/qI47vy4</url>
+     </button>
+     </template>
+    </category>
+</aiml>

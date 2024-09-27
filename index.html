@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Novagraph</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap">
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #333;
+    }
+
+    h1,
+    h2,
+    label,
+    th {
+      font-weight: 500;
+      color: #000000;
+    }
+
+    .table-responsive {
+      overflow: auto;
+    }
+
+    .footer {
+      height: 2em;
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background-color: #344035;
+      color: white;
+      text-align: center;
+    }
+
+    /* Stile per il pulsante quando è disabilitato */
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    /* Stile per il form quando il pulsante è disabilitato */
+    form:disabled {
+      opacity: 0.8;
+    }
+
+    .rating-buttons {
+      display: flex;
+      gap: 5px;
+    }
+
+    .rating-buttons button {
+      flex: 1;
+      padding: 5px;
+    }
+
+    .rating-buttons button.hidden {
+      display: none;
+    }
+
+    .rating-value {
+      display: inline-block;
+      margin-left: 10px;
+      font-weight: bold;
+    }
+
+    .response-container {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container my-5">
+    <h1 class="text-center display-4">Novagraph</h1>
+    <h4 class="text-center display-6">Chatbot</h4>
+    <br>
+    <br>
+    <br>
+    <h3 class="text-center mb-5">Enter your question</h3>
+    <form action="/" method="post" class="form-group" id="formData" autocomplete="off">
+      <label for="query">Question:</label>
+      <input type="text" name="query" id="query" class="form-control">
+      <button type="submit" class="btn btn-primary mt-3 btn-lg btn-block">Send</button>
+    </form>
+    <div id="response-container" class="response-container"></div>
+    <br>
+    <br>
+    <br>
+    <h3 class="text-center mt-5">History of questions and answers</h3>
+    <br>
+    <div class="table-responsive mt-5" style="height: 500px;">
+      <table id="history" class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Question</th>
+            <th>Answer</th>
+            <th>Rating</th>
+            <th>Expert Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>All Right Reserved © Novagraph v1.1 - Università degli Studi di Torino</p>
+  </footer>
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+  <script>
+    const form = document.querySelector("form");
+    const responseContainer = document.querySelector("#response-container");
+    const table = document.querySelector("#history");
+    const submitButton = document.querySelector("button[type='submit']");
+
+    form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    form.elements.query.disabled = true;
+    submitButton.disabled = true;
+    submitButton.classList.add('disabled');
+
+    const query = form.elements.query.value;
+
+    if (query.trim()) {
+      form.elements.query.value = "";
+      responseContainer.innerHTML = "";
+      try {
+        const response = await fetch("/", {
+          method: "POST",
+          body: JSON.stringify({ query }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = await response.json();
+
+        responseContainer.innerHTML = `
+          <p><b>Untranslated:</b> ${data.untranslatedAnswer}</p>
+          <p><b>Translated:</b> ${data.translatedAnswer}</p>
+        `;
+
+        const row1 = table.insertRow();
+        const counterCell1 = row1.insertCell(0);
+        const queryCell1 = row1.insertCell(1);
+        const answerCell1 = row1.insertCell(2);
+        const ratingCell1 = row1.insertCell(3);
+        const expertRatingCell1 = row1.insertCell(4);
+
+        counterCell1.innerHTML = table.rows.length / 2;
+        queryCell1.innerHTML = query;
+        answerCell1.innerHTML = `<b>Untranslated:</b> ${data.untranslatedAnswer}`;
+        ratingCell1.innerHTML = createRatingButtons(data.id, 'untranslated');
+        expertRatingCell1.innerHTML = createExpertRatingButtons(data.id, 'expert-untranslated');
+
+        const row2 = table.insertRow();
+        const counterCell2 = row2.insertCell(0);
+        const queryCell2 = row2.insertCell(1);
+        const answerCell2 = row2.insertCell(2);
+        const ratingCell2 = row2.insertCell(3);
+        const expertRatingCell2 = row2.insertCell(4);
+
+        counterCell2.innerHTML = "";
+        queryCell2.innerHTML = "";
+        answerCell2.innerHTML = `<b>Translated:</b> ${data.translatedAnswer}`;
+        ratingCell2.innerHTML = createRatingButtons(data.id, 'translated');
+        expertRatingCell2.innerHTML = createExpertRatingButtons(data.id, 'expert-translated');
+
+        // Gestione degli eventi di valutazione
+        document.querySelectorAll('.rating-buttons button').forEach(button => {
+          button.addEventListener('click', () => {
+            const parentRow = button.closest('tr');
+            const responseType = button.dataset.type;
+            const ratingButtons = parentRow.querySelector('.rating-buttons');
+            ratingButtons.innerHTML = `<span class="rating-value">Rating: \n${button.innerText}</span>`;
+
+            const vote = button.innerText;
+            const entryId = button.dataset.id; // Use entry ID
+
+            saveVote(entryId, responseType, vote);
+          });
+        });
+
+        document.querySelectorAll('.expert-rating-buttons button').forEach(button => {
+          button.addEventListener('click', () => {
+            const parentRow = button.closest('tr');
+            const responseType = button.dataset.type;
+            const expertRatingButtons = parentRow.querySelector('.expert-rating-buttons');
+            expertRatingButtons.innerHTML = `<span class="rating-value">Expert Rating: \n${button.innerText}</span>`;
+
+            const vote = button.innerText;
+            const entryId = button.dataset.id; // Use entry ID
+
+            saveVote(entryId, responseType, vote);
+          });
+        });
+
+        form.elements.query.disabled = false;
+        submitButton.disabled = false;
+        submitButton.classList.remove('disabled');
+
+      } catch (error) {
+        console.error(error);
+        responseContainer.innerHTML = "Errore durante l'elaborazione della richiesta";
+      }
+    } else {
+      form.elements.query.disabled = false;
+      submitButton.disabled = false;
+      submitButton.classList.remove('disabled');
+    }
+  });
+
+  function createRatingButtons(id, type) {
+    return `
+      <div class="rating-buttons">
+        ${[1, 2, 3, 4, 5].map(num => `
+          <button type="button" data-id="${id}" data-type="${type}">${num}</button>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  function createExpertRatingButtons(id, type) {
+    return `
+      <div class="expert-rating-buttons">
+        ${[1, 2, 3, 4, 5].map(num => `
+          <button type="button" data-id="${id}" data-type="${type}">${num}</button>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  function saveVote(entryId, responseType, vote) {
+    fetch("/save-vote", {
+      method: "POST",
+      body: JSON.stringify({ id: entryId, responseType, vote }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then(response => response.json())
+      .then(data => console.log('Vote saved:', data))
+      .catch(error => console.error('Error saving vote:', error));
+  }
+
+  </script>
+</body>
+
+</html>
