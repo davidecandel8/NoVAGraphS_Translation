@@ -38,7 +38,7 @@ app.post("/", async (req, res) => {
       });
     });
 
-    const response = await axios.post('https://1288-35-187-226-221.ngrok-free.app/submit', { input: query });
+    const response = await axios.post('https://aa0f-35-240-195-161.ngrok-free.app/submit', { input: query });
     const flaskResponse = response.data;
 
     let translatedAnswer = await new Promise((resolve, reject) => {
